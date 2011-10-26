@@ -19,3 +19,7 @@ RESOURCES += \
     protractor.qrc
 
 TRANSLATIONS = qprotractor_ru.ts
+
+binaries.path = /usr/bin/
+binaries.files = qprotractor
+INSTALLS += binaries
