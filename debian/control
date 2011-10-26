@@ -1,0 +1,13 @@
+Source: qprotractor
+Section: graphics
+Priority: extra
+Maintainer: Alexey Guseynov <kibergus@gmail.com>
+Build-Depends: debhelper (>= 7.0.50~)
+Standards-Version: 3.9.1
+Homepage: http://kibergus.su
+
+Package: qprotractor
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Screen protractor.
+ Tool for measuring angles on screen.
