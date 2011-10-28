@@ -15,7 +15,10 @@ int main(int argc, char *argv[])
     a.installTranslator(&qtTranslator);
 
     QTranslator myappTranslator;
-    myappTranslator.load("qprotractor_" + QLocale::system().name());
+    if (!myappTranslator.load("qprotractor_" + QLocale::system().name(),
+        "/usr/share/qprotractor/translations")) {
+        myappTranslator.load("qprotractor_" + QLocale::system().name());
+    }
     a.installTranslator(&myappTranslator);
 
     Protractor w;

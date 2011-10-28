@@ -22,4 +22,8 @@ TRANSLATIONS = qprotractor_ru.ts
 
 binaries.path = /usr/bin/
 binaries.files = qprotractor
-INSTALLS += binaries
+
+translations.path = /usr/share/qprotractor/translations
+translations.files = qprotractor_ru.qm
+
+INSTALLS += binaries translations

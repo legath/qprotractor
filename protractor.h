@@ -13,7 +13,7 @@ public:
     ~Protractor();
 
     QSize sizeHint() const;
-    int heightForWidth(int w) { return w; }
+    int heightForWidth(int w) {return w;}
     bool hasHeightForWidth() {return true;}
 
 public slots:
@@ -23,6 +23,7 @@ public slots:
     void rotateUp();
     void reverse();
     void about();
+    void nextUnit();
 
 protected:
     void mouseMoveEvent(QMouseEvent *event);
@@ -43,6 +44,7 @@ private:
     void reshape();
     QString configPath();
     void loadState();
+    QString angleRepr(double angle);
 
     QPoint dragPosition_;
     bool windowRotated_;
@@ -52,6 +54,7 @@ private:
     bool mouseGrabbed_;
     // 1 for counter clockwise -1 for clockwise
     double scaleDirection_;
+    bool useRadians_;
 };
 
 #endif // PROTRACTOR_H

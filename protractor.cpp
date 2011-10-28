@@ -29,6 +29,7 @@ Protractor::Protractor(QWidget *parent)
     , rotation_(0.0)
     , mouseGrabbed_(false)
     , scaleDirection_(1.0)
+    , useRadians_(false)
 { 
     setMouseTracking(true);
     setWindowTitle(tr("Protractor"));
@@ -104,6 +105,9 @@ void Protractor::mouseReleaseEvent(QMouseEvent * event) {
         QAction* reverseAction = new QAction(tr("Re&verse"), this);
         connect(reverseAction, SIGNAL(triggered()), this, SLOT(reverse()));
         menu.addAction(reverseAction);
+        QAction* unitAction = new QAction(tr("Change &units"), this);
+        connect(unitAction, SIGNAL(triggered()), this, SLOT(nextUnit()));
+        menu.addAction(unitAction);
         menu.addSeparator();
 
         QAction* saveAction = new QAction(tr("&Save state"), this);
@@ -137,9 +141,10 @@ void Protractor::mouseDoubleClickEvent(QMouseEvent * /* event */) {
 void Protractor::resizeEvent(QResizeEvent * /* event */)
 {
     if (width() != height()) {
-        // Preserve aspect ratio
-        // FIXME may be there is a better way
-//        resize(QSize(width(), width()));
+        // Preserve aspect ratio. heightForWidth does not work for X11.
+        // They say, that calling resize from resizeEvent is a bad idea and may
+        // lead to infinite loops. Feel free to suggest better way.
+        resize(QSize(height(), height()));
     }
     reshape();
 }
@@ -214,16 +219,12 @@ void Protractor::paintEvent(QPaintEvent * /* event */) {
 
     painter.setPen(Qt::black);
     if (direction_) {
-        int angle = static_cast<int>(*direction_ / M_PI * 180 * scaleDirection_);
-        angle = (angle + 360) % 360;
-        painter.drawText(-10, height() / 2 - CIRCLE_WIDTH + 3, 20, 15,
-            Qt::AlignHCenter, QString::number(angle));
+        painter.drawText(-15, height() / 2 - CIRCLE_WIDTH + 3, 30, 15,
+            Qt::AlignHCenter, angleRepr(*direction_));
     }
     if (rotatePosition_) {
-        int angle = static_cast<int>(rotation_ / M_PI * 180 * scaleDirection_);
-        angle = (angle + 360) % 360;
-        painter.drawText(-10, - height() / 2 + CIRCLE_WIDTH - 20, 20, 15,
-            Qt::AlignHCenter, QString::number(angle));
+        painter.drawText(-15, - height() / 2 + CIRCLE_WIDTH - 30, 20, 15,
+            Qt::AlignHCenter, angleRepr(rotation_));
     }
 
     painter.rotate(-rotation_ / M_PI * 180.0 - 90);
@@ -248,9 +249,9 @@ void Protractor::paintEvent(QPaintEvent * /* event */) {
     int minTextStep = 360 / (2 * M_PI * (height() / 2 - TEXT_POS) / TEXT_WIDTH);
     minTextStep = ((minTextStep / 5) + 1) * 5;
     for (int angle = 0; angle < 360; angle += minTextStep) {
-        painter.drawText(-10, height() / 2 - 30, 20, 15,
-            Qt::AlignHCenter, QString::number(angle));
-        painter.rotate(-minTextStep * scaleDirection_);
+        painter.drawText(-15, height() / 2 - 30, 30, 15,
+            Qt::AlignHCenter, angleRepr(angle / 180.0 * M_PI));
+        painter.rotate(minTextStep * scaleDirection_);
     }
     painter.restore();
 
@@ -302,7 +303,8 @@ void Protractor::saveState() {
     config << rotation_ << "\n"
            << scaleDirection_ << "\n"
            << pos().x() << " " << pos().y() << "\n"
-           << width() << " " << height() << "\n";
+           << width() << " " << height() << "\n"
+           << useRadians_ << "\n";
 }
 
 void Protractor::loadState() {
@@ -316,6 +318,10 @@ void Protractor::loadState() {
     config >> rotation_ >> scaleDirection_ >> x >> y >> w >> h;
     move(x, y);
     resize(w, h);
+
+    int useRadians;
+    config >> useRadians;
+    useRadians_ = useRadians;
 }
 
 QString Protractor::configPath() {
@@ -337,4 +343,24 @@ void Protractor::about() {
     ui.setupUi(dialog);
 
     dialog->show();
+}
+
+void Protractor::nextUnit() {
+    useRadians_ = !useRadians_;
+}
+
+QString Protractor::angleRepr(double angle) {
+    if (!useRadians_) {
+        angle *= 180.0 / M_PI;
+    }
+    angle *= scaleDirection_;
+
+    double maxAngle = useRadians_ ? 2.0 * M_PI : 360.0;
+    angle = fmod(angle + maxAngle, maxAngle);
+
+    if (useRadians_) {
+        return QString::number(angle, 'd', 2);
+    } else {
+        return QString::number(angle, 'd', 0);
+    }
 }

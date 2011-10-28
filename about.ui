@@ -78,7 +78,7 @@
      <property name="text">
       <string>Controls:
 Move protractor with left mouse button pressed.
-Rotate protractor with right mouse button presed.
+Rotate protractor with right mouse button pressed.
     Watch for current rotation angle near top edge of the tool.
 Resize protractor with scroll.
 Use double click to grab mouse control and measure
