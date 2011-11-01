@@ -33,6 +33,7 @@ Protractor::Protractor(QWidget *parent)
 { 
     setMouseTracking(true);
     setWindowTitle(tr("Protractor"));
+    setWindowFlags(Qt::FramelessWindowHint);
 
     // Without it pos() is broken on first call on X11
     resize(sizeHint());
@@ -138,7 +139,7 @@ void Protractor::mouseDoubleClickEvent(QMouseEvent * /* event */) {
     mouseGrabbed_ = true;
 }
 
-void Protractor::resizeEvent(QResizeEvent * /* event */)
+void Protractor::resizeEvent(QResizeEvent *event)
 {
     if (width() != height()) {
         // Preserve aspect ratio. heightForWidth does not work for X11.
