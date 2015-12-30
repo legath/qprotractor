@@ -6,7 +6,7 @@
 
 TARGET = qprotractor
 TEMPLATE = app
-
+QT       += widgets
 SOURCES += main.cpp\
         protractor.cpp
 
